@@ -2,7 +2,7 @@ name: Build Flutter App
 
 on:
   repository_dispatch:
-    types: [trigger-build] # This will be triggered externally
+    types: [trigger-build]
 
 jobs:
   build:
@@ -15,7 +15,23 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.4' # Change this based on your Flutter version
+          flutter-version: '3.24.4'
+
+      - name: Retrieve API Variables
+        run: |
+          echo "BASE_URL=${{ github.event.client_payload.baseUrl }}" >> $GITHUB_ENV
+          echo "PACKAGE_NAME=${{ github.event.client_payload.packageName }}" >> $GITHUB_ENV
+
+      - name: Update `url_file.dart`
+        run: |
+          sed -i "s|static String baseUrl = '.*'|static String baseUrl = '${{ env.BASE_URL }}'|" lib/url_file.dart
+          sed -i "s|static String packageName = '.*'|static String packageName = '${{ env.PACKAGE_NAME }}'|" lib/url_file.dart
+
+      - name: Run `flutter clean`
+        run: flutter clean
+
+      - name: Change App Package Name
+        run: flutter pub run change_app_package_name:main ${{ env.PACKAGE_NAME }}
 
       - name: Install dependencies
         run: flutter pub get
