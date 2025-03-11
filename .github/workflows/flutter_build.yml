@@ -30,11 +30,11 @@ jobs:
       - name: Run `flutter clean`
         run: flutter clean
 
-      - name: Change App Package Name
-        run: flutter pub run change_app_package_name:main ${{ env.PACKAGE_NAME }}
-
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Change App Package Name
+        run: flutter pub run change_app_package_name:main ${{ env.PACKAGE_NAME }}
 
       - name: Build APK
         run: flutter build apk --release
